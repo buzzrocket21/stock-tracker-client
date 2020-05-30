@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Client, Message } from '@stomp/stompjs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { StockModel } from './StockModel';
+import { ListGroup, ListGroupItem, Input, InputGroup, InputGroupAddon, Button, Container, Fade, Spinner, Collapse } from 'reactstrap';
 
 const client = new Client({
   brokerURL: 'ws://localhost:8085/stock-tracker/websocket',
@@ -14,6 +20,7 @@ const client = new Client({
 
 function App() {
   const [connected, setConnected] = useState(false);
+  const [inputSymbol, setInputSymbol] = useState('');
   const [stockMap, setStockMap] = useState(new Map<string, StockModel>());
 
   useEffect(() => {
@@ -27,14 +34,13 @@ function App() {
       client.subscribe('/topic/public', (message: Message) => {
         if(message.body) {
           const stock = JSON.parse(message.body);
-          stockMap.set(stock.key, stock);
-          setStockMap(new Map<string, StockModel>(stockMap));
+          if(stock) {
+            setStockMap((map)=>{
+              map.set(stock.key, stock);
+              return new Map<string, StockModel>(map);
+            });
+          }
         }
-      });
-
-      client.publish({
-        destination: '/app/track',
-        body: 'intl'
       });
     };
 
@@ -43,16 +49,62 @@ function App() {
     return () => {
       // client.deactivate();
     }
-  }, [connected, stockMap]);
+  }, [connected]);
+
+  const handleAddSymbolSubmit = () => {
+    client.publish({
+      destination: '/app/track',
+      body: inputSymbol
+    });
+    setInputSymbol('');
+  }
 
   return (
     <div className="App">
-      {connected ? 'true' : 'false'}
-      <ul>
-      {Array.from(stockMap.entries()).map(([key, value]: [string, StockModel]) => {
-        return <li key={key}>{`${key}: ${JSON.stringify(value)}`}</li>;
-      })}
-      </ul>
+      <div className="page-header">
+        <h2>Stock Tracker</h2>
+      </div>
+      <Collapse isOpen={!connected} className="text-center">
+        <h2>Connecting...</h2>
+        <Spinner color="secondary"></Spinner>
+      </Collapse>
+      <Fade in={connected}>
+        <Container className="p-3">
+          <form onSubmit={handleAddSymbolSubmit}>
+            <InputGroup className="mb-4">
+              <Input
+                placeholder="Enter ticker symbol"
+                value={inputSymbol}
+                onChange={(e) => setInputSymbol(e.target.value)}></Input>
+              <InputGroupAddon addonType="append">
+                <Button onClick={handleAddSymbolSubmit}>Submit</Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </form>
+          <ListGroup>
+          {Array.from(stockMap.entries()).map(([key, value]: [string, StockModel]) => {
+            return <ListGroupItem key={key}>
+              <h4>{key.toUpperCase()}</h4>
+              {value.price.toLocaleString("en-US", {
+                style: 'currency',
+                currency: 'USD'
+              })}
+              <span className="float-right">
+                <i className="p-2">{moment(value.time).fromNow()}</i>
+                <a href="/" onClick={() => {
+                  client.publish({
+                    destination: '/app/untrack',
+                    body: key
+                  });
+                }}>
+                  <FontAwesomeIcon icon={faTrash} />
+                </a>
+              </span>
+            </ListGroupItem>;
+          })}
+          </ListGroup>
+        </Container>
+      </Fade>
     </div>
   );
 }
