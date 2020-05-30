@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Client, Message } from '@stomp/stompjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 import './App.css';
@@ -85,10 +85,18 @@ function App() {
           {Array.from(stockMap.entries()).map(([key, value]: [string, StockModel]) => {
             return <ListGroupItem key={key}>
               <h4>{key.toUpperCase()}</h4>
-              {value.price.toLocaleString("en-US", {
-                style: 'currency',
-                currency: 'USD'
-              })}
+              <span className={value.change > 0 ? "text-success" : "text-danger"}>
+                {value.price.toLocaleString("en-US", {
+                  style: 'currency',
+                  currency: 'USD'
+                })}
+                <sub className="pl-2">
+                  <FontAwesomeIcon icon={value.change > 0 ? faCaretUp : faCaretDown} />
+                  {value.change.toLocaleString("en-US", {
+                  style: 'currency',
+                  currency: 'USD'
+                })}</sub>
+              </span>
               <span className="float-right">
                 <i className="p-2">{moment(value.time).fromNow()}</i>
                 <a href="/" onClick={() => {
