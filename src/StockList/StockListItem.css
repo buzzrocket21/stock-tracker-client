@@ -1,0 +1,8 @@
+#deleteIcon:hover {
+    cursor: pointer;
+    color: red;
+}
+
+.stock-list-item {
+    cursor: default!important;
+}
