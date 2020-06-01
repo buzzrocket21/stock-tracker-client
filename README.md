@@ -1,3 +1,6 @@
+# stock-tracker-client
+A real-time stock tracking application using the [STOMP](https://docs.spring.io/spring/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/websocket.html) websocket protocol for integration with Java Spring Websockets.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
