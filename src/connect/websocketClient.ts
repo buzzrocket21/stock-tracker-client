@@ -1,7 +1,7 @@
 
 import { Client } from '@stomp/stompjs';
 const client = new Client({
-    brokerURL: 'ws://localhost:8085/stock-tracker/websocket',
+    brokerURL: `${process.env.REACT_APP_WEBSOCKET_URL}/stock-tracker/websocket`,
     connectHeaders: {
       connection: 'upgrade',
       upgrade: 'websocket'

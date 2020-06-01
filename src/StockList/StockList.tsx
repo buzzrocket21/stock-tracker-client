@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import client from '../connect/websocketClient';
 
-import { StockModel } from './StockModel';
+import { StockModel } from '../models/StockModel';
 import StockListItem from './StockListItem';
 import { stockMapContext } from './StocksContext';
 
@@ -15,8 +15,6 @@ function StockList() {
   const [subscribed, setSubscribed] = useState(false);
   const [inputSymbol, setInputSymbol] = useState('');
   const { stocks, addStock, removeStock } = useContext(stockMapContext);
-
-  console.log(client.connected)
 
   const subscribe = useCallback(() => {
     client.subscribe('/topic/public', (message: Message) => {
@@ -86,6 +84,7 @@ function StockList() {
             {stocks.map((stock: StockModel) => {
               return <StockListItem key={stock.key} stockKey={stock.key} value={stock} handleUntrack={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 client.publish({
                   destination: '/app/untrack',
                   body: stock.key

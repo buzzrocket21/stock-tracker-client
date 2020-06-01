@@ -1,13 +1,15 @@
-import React, { } from 'react';
+import React from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import { ListGroupItem, Container, Row, Col } from 'reactstrap';
 
-import { StockModel } from './StockModel';
+import { StockModel } from '../models/StockModel';
 
 import './StockListItem.css';
+import { useHistory } from 'react-router-dom';
+import { formatCurrency } from '../utils/stringFormatters';
 
 interface StockListItemProps {
   stockKey: string;
@@ -16,7 +18,11 @@ interface StockListItemProps {
 }
 
 function StockListItem(props: StockListItemProps) {
-  return <ListGroupItem className="stock-list-item" action>
+  const history = useHistory();
+
+  return <ListGroupItem className="stock-list-item" action onClick={() => {
+    history.push(`/history/${props.stockKey}`);
+  }}>
     <Container>
       <Row>
         <h4>{props.stockKey.toUpperCase()}</h4>
@@ -30,16 +36,10 @@ function StockListItem(props: StockListItemProps) {
           </Row>
           <Row>
           <span className={props.value.change > 0 ? "text-success" : "text-danger"}>
-            {props.value.price.toLocaleString("en-US", {
-              style: 'currency',
-              currency: 'USD'
-            })}
+            {formatCurrency(props.value.price)}
             <sub className="pl-2">
               <FontAwesomeIcon icon={props.value.change > 0 ? faCaretUp : faCaretDown} />
-              {props.value.change.toLocaleString("en-US", {
-                style: 'currency',
-                currency: 'USD'
-              })}</sub>
+              {formatCurrency(props.value.change)}</sub>
           </span>
           </Row>
         </Col>

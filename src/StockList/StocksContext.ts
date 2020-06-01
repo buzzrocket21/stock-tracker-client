@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { StockModel } from './StockModel';
+import { StockModel } from '../models/StockModel';
 export interface StocksContext {
     stocks: Array<StockModel>,
     getStock: (key: string) => StockModel | undefined,

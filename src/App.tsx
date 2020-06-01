@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Jumbotron, Container } from 'reactstrap';
 import StockList from './StockList/StockList';
 import { useStocks, stockMapContext } from './StockList/StocksContext';
+import StockHistory from './StockHistory/StockHistory';
 
 function App() {
   const stocks = useStocks();
@@ -23,6 +24,9 @@ function App() {
                 <stockMapContext.Provider value={stocks}>
                   <StockList />
                 </stockMapContext.Provider>
+              </Route>
+              <Route path="/history/:key">
+                <StockHistory />
               </Route>
               <Route path="/">
                 <Jumbotron>
